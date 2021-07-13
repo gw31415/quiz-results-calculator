@@ -1,9 +1,3 @@
-# Gatsby React Bootstrap Starter
+# quiz-results-calculator
 
-A GatsbyJS starter that includes
-
-- react-bootstrap
-- react-icons
-- sticky on scroll navbar
-- SASS compiler
-- basic layout
+Developped on GatsbyJS

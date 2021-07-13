@@ -1,46 +1,32 @@
-import React, {useState} from "react"
-import {Table, Col, Row, Card, Navbar, ListGroup, Nav, Container} from "react-bootstrap"
+import React, {useState, useRef} from "react"
+import {Button, InputGroup, FormControl, Table, Col, Row, Card, Navbar, ListGroup, Nav, Container} from "react-bootstrap"
 
-const ScoreInput = (props: {onEnter: (input: string) => void}) => {
-	const [value, updateValue] = useState("")
-	return <>
-		<div style={{height: "4ex", }}></div>
-		<div
-			style={{
-				position: "fixed",
-				background: "white",
-				bottom: "0",
-				boxShadow: "0 -1px 1ex rgba(0, 0, 0, 0.2)",
-				height: "4ex",
-				width: "100%",
-				paddingLeft: ".5em",
-				paddingRight: ".5em",
-			}}
-		>
-			<input type="number" style={{
-				margin: "2px",
-				width: "100%",
-				outline: "none",
-				border: "none",
-				background: "none",
-				WebkitAppearance: "none",
-			}} placeholder="数値を入力...."
-				onChange={
-					e => {
-						updateValue(e.target.value)
-					}
+function ScoreInput(props: {onEnter: (input: string) => void}) {
+	const inputref = useRef()
+	const onEnter = () => {
+		if (inputref.current.value !== "") {
+			props.onEnter(inputref.current.value)
+			inputref.current.value = ""
+		}
+		inputref.current.focus()
+	}
+	return <InputGroup>
+		<InputGroup.Prepend>
+			<InputGroup.Text id="basic-addon1">点数</InputGroup.Text>
+		</InputGroup.Prepend>
+		<FormControl type="number" placeholder="数値を入力" pattern="\d*"
+			ref={inputref}
+			onKeyPress={
+				(e: {key: string}) => {
+					if (e.key === "Enter") onEnter()
 				}
-				onKeyPress={
-					e => {
-						if (e.key === "Enter"
-							&& (e.target as any).value !== "") {
-							updateValue((e.target as any).value = "")
-							props.onEnter(value)
-						}
-					}
-				}
-			/>
-		</div></>
+			}
+		/>
+		<InputGroup.Append>
+			<Button variant="outline-secondary"
+				onClick={onEnter}>追加</Button>
+		</InputGroup.Append>
+	</InputGroup >
 }
 
 export default function Main() {
@@ -58,35 +44,41 @@ export default function Main() {
 			</Navbar>
 			<main>
 				<Container>
-					<Row>
-						<Col>
-							{
-								tab === "data" ?
-									<DataPage array={data} /> : <StatisticsPage array={data} />
-							}
-						</Col>
-					</Row>
+					{
+						tab === "data" ?
+							<DataPage data={data} setData={setData} /> :
+							<StatisticsPage array={data} />
+					}
 				</Container>
 			</main>
-			{
-				tab === "data" ?
-					<ScoreInput onEnter={e => {
-						setData([Number(e)].concat(data))
-					}} /> : <></>
-			}
 		</>
 	)
 }
 
-function DataPage(props: {array: number[]}) {
+function DataPage(props: {data: number[], setData: React.Dispatch<React.SetStateAction<number[]>>}) {
 	return (
-		<Card style={{marginTop: "1ex", marginBottom: "1ex", }}>
-			<Card.Body>
-				<ListGroup variant="flush">
-					{props.array.map(score => <ListGroup.Item>{score}</ListGroup.Item>)}
-				</ListGroup>
-			</Card.Body>
-		</Card>
+		<>
+			<Container>
+				<Row>
+					<Col>
+						<ScoreInput onEnter={e => {
+							props.setData([Number(e)].concat(props.data))
+						}} />
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<Card>
+							<Card.Body>
+								<ListGroup variant="flush">
+									{props.data.map(score => <ListGroup.Item>{score}</ListGroup.Item>)}
+								</ListGroup>
+							</Card.Body>
+						</Card>
+					</Col>
+				</Row>
+			</Container>
+		</>
 	)
 }
 
@@ -97,8 +89,8 @@ function average(data: number[]) {
 }
 function variance(data: number[]) {
 	let sum = 0
-	for (const n of data) sum += n*n
-	return sum/data.length - (average(data) ^ 2)
+	for (const n of data) sum += n * n
+	return sum / data.length - (average(data) ^ 2)
 }
 
 function standard_deviation(data: number[]) {
@@ -107,15 +99,21 @@ function standard_deviation(data: number[]) {
 
 function StatisticsPage(props: {array: number[]}) {
 	return (
-		<div style={{marginTop: "1ex", marginBottom: "1ex", textAlign: "right"}}>
-			<Table striped bordered>
-				<tbody>
-					<tr><td>度数</td><td>{props.array.length}</td></tr>
-					<tr><td>平均値</td><td>{average(props.array).toFixed(2)}</td></tr>
-					<tr><td>分散</td><td>{variance(props.array).toFixed(2)}</td></tr>
-					<tr><td>標準偏差</td><td>{standard_deviation(props.array).toFixed(2)}</td></tr>
-				</tbody>
-			</Table>
-		</div>
+		<Container>
+			<Row>
+				<Col>
+					<div style={{textAlign: "right"}}>
+						<Table striped bordered>
+							<tbody>
+								<tr><td>度数</td><td>{props.array.length}</td></tr>
+								<tr><td>平均値</td><td>{average(props.array).toFixed(2)}</td></tr>
+								<tr><td>分散</td><td>{variance(props.array).toFixed(2)}</td></tr>
+								<tr><td>標準偏差</td><td>{standard_deviation(props.array).toFixed(2)}</td></tr>
+							</tbody>
+						</Table>
+					</div>
+				</Col>
+			</Row>
+		</Container>
 	)
 }
