@@ -1,8 +1,9 @@
 import React, {useState, useRef} from "react"
+import Seo from "../components/seo.js";
 import {Button, InputGroup, FormControl, Table, Col, Row, Card, Navbar, ListGroup, Nav, Container} from "react-bootstrap"
 
 function ScoreInput(props: {onEnter: (input: string) => void}) {
-	const inputref = useRef()
+	const inputref: React.MutableRefObject<any> = useRef()
 	const onEnter = () => {
 		if (inputref.current.value !== "") {
 			props.onEnter(inputref.current.value)
@@ -58,6 +59,7 @@ export default function Main() {
 function DataPage(props: {data: number[], setData: React.Dispatch<React.SetStateAction<number[]>>}) {
 	return (
 		<>
+			<Seo title="データ" />
 			<Container>
 				<Row>
 					<Col>
@@ -71,7 +73,13 @@ function DataPage(props: {data: number[], setData: React.Dispatch<React.SetState
 						<Card>
 							<Card.Body>
 								<ListGroup variant="flush">
-									{props.data.map(score => <ListGroup.Item>{score}</ListGroup.Item>)}
+									{props.data.map(score =>
+										<ListGroup.Item style={{textAlign: "right"}}>
+											<Row>
+												<Col>{score} 点</Col>
+												<Col>{standard_score(score, props.data).toFixed(2)}</Col>
+											</Row>
+										</ListGroup.Item>)}
 								</ListGroup>
 							</Card.Body>
 						</Card>
@@ -82,38 +90,46 @@ function DataPage(props: {data: number[], setData: React.Dispatch<React.SetState
 	)
 }
 
-function average(data: number[]) {
+function average(data: number[]) { // 平均値
 	let sum = 0
 	for (const n of data) sum += n
 	return sum / data.length
 }
-function variance(data: number[]) {
+function variance(data: number[]) { // 分散
 	let sum = 0
 	for (const n of data) sum += n * n
-	return sum / data.length - (average(data) ^ 2)
+	return sum / data.length - (average(data) * average(data))
 }
 
-function standard_deviation(data: number[]) {
+function standard_deviation(data: number[]) { // 標準偏差
 	return Math.sqrt(variance(data))
+}
+
+function standard_score(score: number, data: number[]) { // 偏差値
+	if (variance(data) === 0) return 50
+	return (score - average(data)) * 10 / standard_deviation(data) + 50
 }
 
 function StatisticsPage(props: {array: number[]}) {
 	return (
-		<Container>
-			<Row>
-				<Col>
-					<div style={{textAlign: "right"}}>
-						<Table striped bordered>
-							<tbody>
-								<tr><td>度数</td><td>{props.array.length}</td></tr>
-								<tr><td>平均値</td><td>{average(props.array).toFixed(2)}</td></tr>
-								<tr><td>分散</td><td>{variance(props.array).toFixed(2)}</td></tr>
-								<tr><td>標準偏差</td><td>{standard_deviation(props.array).toFixed(2)}</td></tr>
-							</tbody>
-						</Table>
-					</div>
-				</Col>
-			</Row>
-		</Container>
+		<>
+			<Seo title="統計" />
+			<Container>
+				<Row>
+					<Col>
+						<div style={{textAlign: "right"}}>
+							<Table striped bordered>
+								<tbody>
+									<tr><td>度数</td><td>{props.array.length}</td></tr>
+									<tr><td>平均値</td><td>{average(props.array).toFixed(2)}</td></tr>
+									<tr><td>分散</td><td>{variance(props.array).toFixed(2)}</td></tr>
+									<tr><td>標準偏差</td><td>{standard_deviation(props.array).toFixed(2)}</td></tr>
+								</tbody>
+							</Table>
+						</div>
+					</Col>
+				</Row>
+			</Container>
+		</>
 	)
 }
