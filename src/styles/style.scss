@@ -3,3 +3,7 @@
 
 @import "layout";
 @import "navbar";
+body {
+	user-select: none;
+	overscroll-behavior: none;
+}

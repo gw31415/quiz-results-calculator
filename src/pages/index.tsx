@@ -1,6 +1,10 @@
 import React, {useState, useRef} from "react"
 import Seo from "../components/seo.js";
-import {Button, InputGroup, FormControl, Table, Col, Row, Card, Navbar, ListGroup, Nav, Container} from "react-bootstrap"
+import {Table, Col, Row, Card, ListGroup, Container} from "react-bootstrap"
+import {AppBar, Box, Typography, Tab, Tabs, TextField, Stack, IconButton, Button} from "@mui/material"
+import {Add, Edit, BarChart, Grade} from "@mui/icons-material"
+import SwipableViews from "react-swipeable-views"
+import {useTheme} from '@mui/material/styles'
 
 function ScoreInput(props: {onEnter: (input: string) => void}) {
 	const inputref: React.MutableRefObject<any> = useRef()
@@ -11,83 +15,142 @@ function ScoreInput(props: {onEnter: (input: string) => void}) {
 		}
 		inputref.current.focus()
 	}
-	return <InputGroup>
-		<InputGroup.Prepend>
-			<InputGroup.Text id="basic-addon1">点数</InputGroup.Text>
-		</InputGroup.Prepend>
-		<FormControl type="number" placeholder="数値を入力" pattern="\d*"
-			ref={inputref}
+	return <Stack direction="row" spacing={1}>
+		<TextField type="number"
+			InputProps={
+				{
+					inputProps: {
+						pattern: "\\d*"
+					}
+				}
+			}
+			fullWidth
+			variant="filled"
+			label="点数"
+			inputRef={inputref}
 			onKeyPress={
 				(e: {key: string}) => {
 					if (e.key === "Enter") onEnter()
 				}
 			}
 		/>
-		<InputGroup.Append>
-			<Button variant="outline-secondary"
-				onClick={onEnter}>追加</Button>
-		</InputGroup.Append>
-	</InputGroup >
+		<IconButton onClick={onEnter}><Add /></IconButton>
+	</Stack>
+}
+
+interface TabPanelProps {
+	children?: React.ReactNode;
+	index: number;
+	value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+	const {children, value, index, ...other} = props;
+
+	return (
+		<div
+			role="tabpanel"
+			hidden={value !== index}
+			id={`simple-tabpanel-${index}`}
+			aria-labelledby={`simple-tab-${index}`}
+			{...other}
+		>
+			{value === index && (
+				<Box sx={{p: 3}}>
+					<Typography>{children}</Typography>
+				</Box>
+			)}
+		</div>
+	);
+}
+
+function a11yProps(index: number) {
+	return {
+		id: `simple-tab-${index}`,
+		'aria-controls': `simple-tabpanel-${index}`,
+	};
 }
 
 export default function Main() {
 	const [data, setData] = useState([])
-	const [tab, setTab] = useState("data")
+	const [tab, setTab] = useState(0)
+	const theme = useTheme()
 	return (
 		<>
-			<Navbar bg="light" sticky="top">
-				<Nav defaultActiveKey="data" onSelect={
-					e => setTab(e)
-				}>
-					<Nav.Link eventKey="data">データ</Nav.Link>
-					<Nav.Link eventKey="statistics">統計</Nav.Link>
-				</Nav>
-			</Navbar>
-			<main>
-				<Container>
-					{
-						tab === "data" ?
-							<DataPage data={data} setData={setData} /> :
-							<StatisticsPage array={data} />
+			<AppBar position="sticky" color="default">
+				<Tabs
+					value={tab}
+					onChange={(_: unknown, newValue: number) =>
+						setTab(newValue)
 					}
-				</Container>
-			</main>
+					variant="fullWidth"
+				>
+					<Tab icon={<Edit />} {...a11yProps(0)} />
+					<Tab icon={<Grade />} {...a11yProps(1)} />
+					<Tab icon={<BarChart />} {...a11yProps(2)} />
+				</Tabs>
+			</AppBar>
+			<SwipableViews
+				axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+				index={tab}
+				onChangeIndex={setTab}
+			>
+				<TabPanel value={tab} index={0} >
+					<Seo title="データ入力" />
+					<Stack spacing={1} direction="column">
+						<ScoreInput onEnter={e => {
+							setData([Number(e)].concat(data))
+						}} />
+						<DataTable data={data} />
+						{
+							data.length !== 0 ?
+								<Button variant="text" onClick={
+									() => {setData([])}
+								}>リセット</Button> :
+								<></>
+						}
+					</Stack>
+				</TabPanel>
+				<TabPanel value={tab} index={1} >
+					<Seo title="ランキング" />
+					<DataTable data={
+						Array.from(data).sort((a, b) => b - a)
+					} />
+				</TabPanel>
+				<TabPanel value={tab} index={2} >
+					<Seo title="統計" />
+					<StatisticsTable array={data} />
+				</TabPanel>
+			</SwipableViews>
 		</>
 	)
 }
 
-function DataPage(props: {data: number[], setData: React.Dispatch<React.SetStateAction<number[]>>}) {
-	return (
-		<>
-			<Seo title="データ" />
-			<Container>
-				<Row>
-					<Col>
-						<ScoreInput onEnter={e => {
-							props.setData([Number(e)].concat(props.data))
-						}} />
-					</Col>
-				</Row>
-				<Row>
-					<Col>
-						<Card>
-							<Card.Body>
-								<ListGroup variant="flush">
-									{props.data.map(score =>
-										<ListGroup.Item style={{textAlign: "right"}}>
-											<Row>
-												<Col>{score} 点</Col>
-												<Col>{standard_score(score, props.data).toFixed(2)}</Col>
-											</Row>
-										</ListGroup.Item>)}
-								</ListGroup>
-							</Card.Body>
-						</Card>
-					</Col>
-				</Row>
-			</Container>
-		</>
-	)
+function DataTable(props: {data: number[]}) {
+	if (props.data.length === 0)
+		return <div style={{
+			textAlign: "center",
+			paddingTop: "20vh",
+			paddingBottom: "20vh",
+			fontStyle: "italic",
+			color: "gray",
+		}}>
+			データを入力してください。
+		</div>
+	else
+		return <Card>
+			<Card.Body>
+				<ListGroup variant="flush">
+					{props.data.map(score =>
+						<ListGroup.Item style={{textAlign: "right"}}>
+							<Row>
+								<Col>{score} 点</Col>
+								<Col>{standard_score(score, props.data).toFixed(2)}</Col>
+							</Row>
+						</ListGroup.Item>)}
+				</ListGroup>
+			</Card.Body>
+		</Card>
 }
 
 function average(data: number[]) { // 平均値
@@ -110,10 +173,9 @@ function standard_score(score: number, data: number[]) { // 偏差値
 	return (score - average(data)) * 10 / standard_deviation(data) + 50
 }
 
-function StatisticsPage(props: {array: number[]}) {
+function StatisticsTable(props: {array: number[]}) {
 	return (
 		<>
-			<Seo title="統計" />
 			<Container>
 				<Row>
 					<Col>
