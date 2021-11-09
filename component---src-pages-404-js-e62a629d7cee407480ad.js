@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkquiz_results_calculator=self.webpackChunkquiz_results_calculator||[]).push([[883],{9616:function(e,t,l){l.r(t);var u=l(7294),n=l(3751);t.default=function(){return u.createElement("div",null,u.createElement(n.Z,{title:"404: Not found"}),u.createElement("h1",null,"NOT FOUND"))}}}]);
+//# sourceMappingURL=component---src-pages-404-js-e62a629d7cee407480ad.js.map

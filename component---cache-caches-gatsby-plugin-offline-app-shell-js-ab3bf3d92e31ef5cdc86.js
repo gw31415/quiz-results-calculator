@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkquiz_results_calculator=self.webpackChunkquiz_results_calculator||[]).push([[306],{1930:function(e,t,u){var l=u(5318);t.__esModule=!0,t.default=void 0;var n=l(u(5354)),r=l(u(7294)),a=function(e){function t(){return e.apply(this,arguments)||this}return(0,n.default)(t,e),t.prototype.render=function(){return r.default.createElement(r.default.Fragment,null)},t}(r.default.Component),c=a;t.default=c}}]);
+//# sourceMappingURL=component---cache-caches-gatsby-plugin-offline-app-shell-js-ab3bf3d92e31ef5cdc86.js.map
