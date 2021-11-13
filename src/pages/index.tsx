@@ -1,44 +1,14 @@
 import React, {useState} from "react"
 import Seo from "../components/seo.js";
 import {Table, Col, Row, Card, ListGroup, Container} from "react-bootstrap"
-import {AppBar, Box, Typography, Tab, Tabs, Stack, Button} from "@mui/material"
+import {AppBar, Tab, Tabs, Stack, Button} from "@mui/material"
 import {Edit, BarChart, Grade} from "@mui/icons-material"
 import SwipableViews from "react-swipeable-views"
 import {useTheme} from '@mui/material/styles'
+
 import {ScoreInput} from "../components/ScoreInput"
+import {TabPanel, a11yProps} from "../components/TabPanel"
 
-interface TabPanelProps {
-	children?: React.ReactNode;
-	index: number;
-	value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-	const {children, value, index, ...other} = props;
-
-	return (
-		<div
-			role="tabpanel"
-			hidden={value !== index}
-			id={`simple-tabpanel-${index}`}
-			aria-labelledby={`simple-tab-${index}`}
-			{...other}
-		>
-			{value === index && (
-				<Box sx={{p: 3}}>
-					<Typography>{children}</Typography>
-				</Box>
-			)}
-		</div>
-	);
-}
-
-function a11yProps(index: number) {
-	return {
-		id: `simple-tab-${index}`,
-		'aria-controls': `simple-tabpanel-${index}`,
-	};
-}
 
 export default function Main() {
 	const [data, setData] = useState([])
