@@ -1,6 +1,5 @@
 import React, {useState} from "react"
 import Seo from "../components/seo.js";
-import {Table, Col, Row, Container} from "react-bootstrap"
 import {AppBar, Tab, Tabs, Stack, Button} from "@mui/material"
 import {Edit, BarChart, Grade} from "@mui/icons-material"
 import SwipableViews from "react-swipeable-views"
@@ -9,6 +8,7 @@ import {useTheme} from '@mui/material/styles'
 import {ScoreInput} from "../components/ScoreInput"
 import {TabPanel, a11yProps} from "../components/TabPanel"
 import {DataTable} from "../components/DataTable"
+import {StatisticsTable} from "../components/StasticsTable"
 
 
 export default function Main() {
@@ -62,45 +62,6 @@ export default function Main() {
 					<StatisticsTable array={data} />
 				</TabPanel>
 			</SwipableViews>
-		</>
-	)
-}
-
-function average(data: number[]) { // 平均値
-	let sum = 0
-	for (const n of data) sum += n
-	return sum / data.length
-}
-
-function variance(data: number[]) { // 分散
-	let sum = 0
-	for (const n of data) sum += n * n
-	return sum / data.length - (average(data) * average(data))
-}
-
-function standard_deviation(data: number[]) { // 標準偏差
-	return Math.sqrt(variance(data))
-}
-
-function StatisticsTable(props: {array: number[]}) {
-	return (
-		<>
-			<Container>
-				<Row>
-					<Col>
-						<div style={{textAlign: "right"}}>
-							<Table striped bordered>
-								<tbody>
-									<tr><td>度数</td><td>{props.array.length}</td></tr>
-									<tr><td>平均値</td><td>{average(props.array).toFixed(2)}</td></tr>
-									<tr><td>分散</td><td>{variance(props.array).toFixed(2)}</td></tr>
-									<tr><td>標準偏差</td><td>{standard_deviation(props.array).toFixed(2)}</td></tr>
-								</tbody>
-							</Table>
-						</div>
-					</Col>
-				</Row>
-			</Container>
 		</>
 	)
 }
