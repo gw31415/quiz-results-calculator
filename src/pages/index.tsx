@@ -1,42 +1,11 @@
-import React, {useState, useRef} from "react"
+import React, {useState} from "react"
 import Seo from "../components/seo.js";
 import {Table, Col, Row, Card, ListGroup, Container} from "react-bootstrap"
-import {AppBar, Box, Typography, Tab, Tabs, TextField, Stack, IconButton, Button} from "@mui/material"
-import {Add, Edit, BarChart, Grade} from "@mui/icons-material"
+import {AppBar, Box, Typography, Tab, Tabs, Stack, Button} from "@mui/material"
+import {Edit, BarChart, Grade} from "@mui/icons-material"
 import SwipableViews from "react-swipeable-views"
 import {useTheme} from '@mui/material/styles'
-
-function ScoreInput(props: {onEnter: (input: string) => void}) {
-	const inputref: React.MutableRefObject<any> = useRef()
-	const onEnter = () => {
-		if (inputref.current.value !== "") {
-			props.onEnter(inputref.current.value)
-			inputref.current.value = ""
-		}
-		inputref.current.focus()
-	}
-	return <Stack direction="row" spacing={1}>
-		<TextField type="number"
-			InputProps={
-				{
-					inputProps: {
-						pattern: "\\d*"
-					}
-				}
-			}
-			fullWidth
-			variant="filled"
-			label="点数"
-			inputRef={inputref}
-			onKeyPress={
-				(e: {key: string}) => {
-					if (e.key === "Enter") onEnter()
-				}
-			}
-		/>
-		<IconButton onClick={onEnter}><Add /></IconButton>
-	</Stack>
-}
+import {ScoreInput} from "../components/ScoreInput"
 
 interface TabPanelProps {
 	children?: React.ReactNode;
@@ -158,6 +127,7 @@ function average(data: number[]) { // 平均値
 	for (const n of data) sum += n
 	return sum / data.length
 }
+
 function variance(data: number[]) { // 分散
 	let sum = 0
 	for (const n of data) sum += n * n
